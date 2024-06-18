@@ -1,0 +1,183 @@
+//work on the fsr detect system of the code 
+#include <Servo.h>
+#define SERV6 13 //servo 6 on digital port 10
+#define SERV5 12 //servo 5 on digital port 9 
+#define SERV4 11 //servo 4 on digital port 8
+#define SERV3 8 //servo 3 on digital port 11
+#define SERV2 9 //servo 2 on digital port 12
+#define SERV1 10//servo 1 on digital port 13 
+/*
+ * digital port 10 = number 13
+ * digtial port 9 = number 12 
+ * digtial port 8 = number 11
+ * digtial port 13 = number 10
+ * digital port 12 = numeber 9
+ * digtial port 11 = numer 8
+ */
+Servo s1;//label the motor
+Servo s2;//label the motor
+Servo s3;//label the motor
+Servo s4;//label the motor
+Servo s5;//label the motor
+Servo s6;//label the motor
+int Paxis = 360;// used to define postive axis at 360 degree angles 
+int naxis = -360; // used to define postive axis at -360 degree angles 
+int zeroaxis = 0;//used to define zero degree axis 
+int angle1 = 0;//servo 1 current angle
+int angle2 = 120; //servo 2 current angle //80
+int angle3 = 0; //servo 3 current angle 
+int angle4 = 90; //servo 4 current angle
+int angle5 = 90; //servo 5 current angle
+int angle6 = 30; //servo 6 current angle
+
+int servo1_speed = 1;//motor speed
+int servo2_speed = 1;//motor speed
+int servo3_speed = 1;//motor speed
+int angle1min = naxis; //servo 1 minumum
+int angle1max = Paxis;//servo 2 maximum 
+int angle2max = Paxis; //servo 2 maximum
+int angle2min = zeroaxis; //servo 2 minimum angle 
+int angle3min = zeroaxis; // servo 3 minmum angle 
+int angle3max = Paxis; // servo 3 maximum
+int angle4min = zeroaxis; // servo 4 minmum angle 
+int angle4max = Paxis ; //servo 4 maximum angle 
+int angle5min = zeroaxis; // servo 5 minimum angle 
+int angle5max = Paxis ; // servo 5 maximum angle 
+int angle6min = 40;   //servo 6 minimum angle
+int angle6max = Paxis; //servo 6 maximum angle
+int t=1000;// varible used to set values at 1 secound delays 
+int T=10000;// varible used to set values at 10 secound delays
+int initial1_angle, final1_angle, difference1, angle_increment1, initial2_angle, final2_angle, difference2,angle_increment2,initial3_angle, final3_angle, difference3, angle_increment3;
+
+boolean display_angles = true; //boolean used to update the angle of each servo on Serial Monitor
+
+void setup()  {
+  int irDetect(7,6,30000);//set up for the ir sensor for the it input 
+//setup for the preset 
+  Serial.begin(9600);//enabales the serial moptor to turn on  
+  starterDefinition();//defines all motors and pins in terms of logic 
+//setup 
+ if (irDetect <= 3000)// if the value is greater than or = to 30000 then do the flollowing set of code 
+{
+   ArmMovement(80,s3,95,-1);//movement(time,motor,angle,speed/direction)
+   ArmMovement(80,s2,angle2,1);//movement(time,motor,angle,speed/direction)
+   ArmMovement(80,s6,45,-1);//movement(time,motor,angle,speed/direction)
+   delay(t);//delay the functiopn above by t( t=1000 secound'1 secound)
+} 
+if(irDetect > 3000)// if the value is less than or = to 30000 then do the flollowing set of code 
+{
+//postion uper arm to object 
+  ArmMovement(60,s3,95,-1);//(time,motor,angle,speed) 
+  ArmMovement(60,s2,70,1);//(time,motor,angle,speed)
+  delay(1500);//time before next step
+ generalpreset(40,s6,90,-1);//(time,motor,angle,speed) 
+//lift and drop
+  ArmMovement(80,s3,65,-1);//(time,motor,angle,speed)
+  ArmMovement(90,s1,80,-1);//(time,motor,angle,speed)
+  ArmMovement(80,s3,110,1);//(time,motor,angle,speed)
+  ArmMovement(80,s2,90,1);//(time,motor,angle,speed)
+  generalpreset(200,s6,angle6,1);//(time,motor,angle,speed)
+//UP AND OUT 
+  ArmMovement(80,s3,90,1);//(time,motor,angle,speed)
+  ArmMovement(80,s2,angle2,-1);//(time,motor,angle,speed)
+  Detach_motors();// detachs all motors in the portion of this code 
+}
+}  
+void loop() {}
+/*this area is being used for examples only 
+ * void int Servo(servo SS , int initialAngle,){ // in this world/scope you only use the args (sero and the startposition)
+  //
+    // find initial angle LOCAL VAR   int initangle
+    // set a slow speed and/or  a good sixe dellay
+    // loop until initial position = startPosition
+    // diff = finalAngle - initial angle
+    // int iterator = 0   //
+    // if diff >0  
+  } 
+*/
+/*
+ * starter definiton sets up all the motors 
+ * detach all of the motors 
+ * arm movement is the secound portion of movement and falls after the general preset 
+ * general preset does this in summary
+ */
+void irDetect(int irLedpin ,int irReciverPin,long frequency)//set up for the ir sensor for the it input 
+{
+  int irMiddel= digitalRead(irReciverPin);//this is difining if the object is detected 
+  delay(1);//delayed by 1 millasecound
+  if(irMiddel == 0)//if the object is detected let it be represented as a 0 value 
+  Serial.println(" ir detected object");// imit the following sentece in the serial monitor 
+}
+void generalpreset(int time, Servo myServo,int finalAngle, int servospeed)//used to set the logic up fro the order in witch the program will follow 
+{
+  int starterAngle  = myServo.read();//preset the angle of the motor to default  
+  int diffrenece;//in this case the diffrence = the starter going to the final
+  int angleincrement;//the motor will move slowly to the final angle 
+  diffrenece=finalAngle-starterAngle;// this if the logic behind the diffrenece 
+  if(diffrenece >0)//the diffrence is greater than 0
+  {
+    servospeed = servospeed*-1;//the speed of the motor 
+  }
+  if(diffrenece <0)//the diffrence is less than 0
+  {
+    servospeed = servospeed*-1;//the speed of the motor 
+    diffrenece = diffrenece *-1;//the logic of the value of the diffrence 
+  }
+for(int i= 1; i <= diffrenece; i++)//this portion explains threw logic that the value of "diffrence will increment by 1
+{
+  myServo.write(starterAngle);//servo.write(the starter angle)
+  angleincrement=starterAngle + servospeed;//this is explaining the increments logic witch is diffined by the starter angle being increased at a speed of 1 and going at 1 tick 
+  starterAngle = angleincrement;//this is logic renenforcing the information above
+  delay(time);// logic beind the time it takes to get to the final angle 
+}
+}
+void ArmMovement(int time, Servo myServo,int finalAngle, int servospeed)//used to set the logic up fro the order in witch the program will follow 
+{
+  int starterAngle  = myServo.read();//preset the angle of the motor to default
+  int diffrenece;//in this case the diffrence = the starter going to the final 
+  int angleincrement;//the motor will move slowly to the final angle 
+  diffrenece=finalAngle-starterAngle;// this if the logic behind the diffrenece 
+  if(diffrenece >0)//the diffrence is greater than 0
+  {
+    servospeed = servospeed*-1;//the speed of the motor 
+  }
+  if(diffrenece <0)//the diffrence is less than 0
+  {
+    servospeed = servospeed*-1;//the speed of the motor 
+    diffrenece = diffrenece *-1;//the logic of the value of the diffrence
+  }
+for(int i= 1; i <= diffrenece; i++)//this portion explains threw logic that the value of "diffrence will increment by 1
+{
+  myServo.write(starterAngle);//servo.write(the starter angle)
+  angleincrement=starterAngle + servospeed;//this is explaining the increments logic witch is diffined by the starter angle being increased at a speed of 1 and going at 1 tick 
+  starterAngle = angleincrement;//this is logic renenforcing the information above
+  delay(time);// logic beind the time it takes to get to the final angle 
+}
+}
+
+void starterDefinition()//used to set the logic up fro the order in witch the program will follow 
+{
+  pinMode(6,OUTPUT);//conect the ir reciver to the pin 
+  pinMode(7,INPUT);//conect the ir sensor to the pin 
+  s2.attach(SERV2);//attach the motor to the program
+  generalpreset(300,s2,angle2,-1);//(time,motor,angle,speed)
+  delay(t);//delay by 1 secound
+  s3.attach(SERV3);//attach the motor to the program
+  generalpreset(250,s3,90,-1);//(time,motor,angle,speed)
+  delay(t);//delay by 1 secound
+  s1.attach(SERV1); //the motor to the program
+  generalpreset(200,s1,angle1,1);//(time,motor,angle,speed) //works going right
+  delay(t);//time before next step 
+  s6.attach(SERV6);//attach the motor to the program
+  generalpreset(200,s6,angle6,1);//(time,motor,angle,speed)
+  delay(t);//time before next step
+}
+void Detach_motors(){
+  s2.attach(SERV2);//attach the motor to the program
+  s3.attach(SERV3);//attach the motor to the program
+  s1.attach(SERV1); //the motor to the program
+  s6.attach(SERV6);//attach the motor to the program
+  s1.detach();//detach the motor
+  s2.detach();//detach the motor
+  s3.detach();//detach the motor
+  s4.detach();//detach the motor
