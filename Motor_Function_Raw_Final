@@ -1,0 +1,203 @@
+#include <Servo.h>
+#define SERV6 13 //servo 6 on digital port 10
+#define SERV5 12 //servo 5 on digital port 9 
+#define SERV4 11 //servo 4 on digital port 8
+#define SERV3 8 //servo 3 on digital port 11
+#define SERV2 9 //servo 2 on digital port 12
+#define SERV1 10//servo 1 on digital port 13 
+/*
+ * digital port 10 = number 13
+ * digtial port 9 = number 12 
+ * digtial port 8 = number 11
+ * digtial port 13 = number 10
+ * digital port 12 = numeber 9
+ * digtial port 11 = numer 8
+ */
+Servo s1;
+Servo s2;
+Servo s3;
+Servo s4;
+Servo s5;
+Servo s6;
+
+int angle1 = 0;//servo 1 current angle
+int angle2 = 89; //servo 2 current angle 
+int angle3 = 0; //servo 3 current angle 
+int angle4 = 90; //servo 4 current angle
+int angle5 = 90; //servo 5 current angle
+int angle6 = 30; //servo 6 current angle
+
+int servo1_speed = -1;//motor speed
+int servo2_speed = 1;//motor speed
+int servo3_speed = -1;//motor speed
+
+int angle1min = -360; //servo 1 minumum
+int angle1max = 360;//servo 2 maximum 
+int angle2max = 360; //servo 2 maximum
+int angle2min = 0; //servo 2 minimum angle 
+int angle3min = 0; // servo 3 minmum angle 
+int angle3max = 360; // servo 3 maximum
+int angle4min = 0; // servo 4 minmum angle 
+int angle4max = 360; //servo 4 maximum angle 
+int angle5min = 0; // servo 5 minimum angle 
+int angle5max = 360; // servo 5 maximum angle 
+int angle6min = 40;   //servo 6 minimum angle
+int angle6max = 360; //servo 6 maximum angle
+int t=10000;
+
+int initial1_angle, final1_angle, difference1, angle_increment1, initial2_angle, final2_angle, difference2,angle_increment2,initial3_angle, final3_angle, difference3, angle_increment3;
+
+boolean display_angles = true; //boolean used to update the angle of each servo on Serial Monitor
+
+void setup()  {
+ Serial.begin(9600);
+
+
+
+  s1.attach(SERV1); //the motor to the program
+  generalpreset(200,s1,angle1,-1); // initServo(s1, angle1)
+  delay(1000);
+  s2.attach(SERV2);//attach the motor to the program
+  int initangle2 = s2.read();
+  generalpreset(200,s2,angle2,1);// initServo(s2, angle2)
+  delay(1000);
+  s3.attach(SERV3);// initServo(s3, angle3)
+ generalpreset(200,s3,angle3,1);
+  delay(1000);
+  s6.attach(SERV6);
+  generalpreset(200,s6,angle6,1);
+  delay(1000);
+//instructions 
+
+ 
+  servo1M(80); // instead pass servo and time: servoM(s2,time)
+  servo2M(60);
+  delay(1500);
+  servo3M(80);
+
+
+  delay(1500);
+  generalpreset(100,s6,45,-1);
+}
+void loop() {
+
+ 
+
+}
+
+/*void int Servo(servo SS , int initialAngle,){ // in this world/scope you only use the args (sero and the startposition)
+  //
+    // find initial angle LOCAL VAR   int initangle
+    // set a slow speed and/or  a good sixe dellay
+    // loop until initial position = startPosition
+    // diff = finalAngle - initial angle
+    // int iterator = 0   //
+    // if diff >0  
+  } 
+*/
+void generalpreset(int time, Servo myServo,int finalAngle, int servospeed){
+  int starterAngle  = myServo.read();
+  int diffrenece;// ang1 - ang2 
+  int angleincrement;
+  diffrenece=finalAngle-starterAngle;
+  if(diffrenece >0)
+  {
+    servospeed = servospeed*-1;
+  }
+  if(diffrenece <0)
+  {
+    servospeed = servospeed*-1;
+    diffrenece = diffrenece *-1;
+  }
+for(int i= 1; i <= diffrenece; i++)
+{
+  myServo.write(starterAngle);
+  angleincrement=starterAngle + servospeed;
+  starterAngle = angleincrement;
+  delay(time);
+}
+
+}
+  
+void servo1M(int time)// co
+{ 
+  initial1_angle = angle1;//angle 1 =90
+  final1_angle = 90;
+  difference1 = initial1_angle-final1_angle;
+  if(difference1 >0)
+  {
+    servo1_speed = servo1_speed*-1;
+  }
+  if(difference1<0)
+  {
+    servo1_speed = servo1_speed*-1;
+    difference1 = difference1 *-1;
+  }
+  
+  
+  for(int l= 1; l <= difference1; l++)
+  {     
+    angle_increment1 = initial1_angle + servo1_speed;
+    s1.write(angle_increment1);
+        initial1_angle = angle_increment1;
+        delay(time);
+
+    }
+}
+
+void servo2M(int time) 
+  {
+  int initial2_angle, final2_angle, difference2, angle_increment2;
+  initial2_angle = angle2;//angle 2 =30
+  final2_angle = 20;
+  difference2 = final2_angle-initial2_angle;
+  if(difference2 >0)
+  {
+    servo2_speed = servo2_speed*-1;
+  }
+  if(difference2<0)
+  {
+    servo2_speed = servo2_speed*-1;
+    difference2 = difference2*-1;
+  }
+  
+  
+  for(int i= 1; i <= difference2; i++)
+  { 
+    Serial.println("hi");
+    delay(10);    
+    angle_increment2 = initial2_angle + servo2_speed;
+    s2.write(angle_increment2);
+     initial2_angle = angle_increment2;
+     delay(time);
+     
+    }
+  }
+void servo3M(int time) 
+{
+  int initial3_angle, final3_angle, difference3, angle_increment3;
+  initial3_angle = angle3;//angle 3 =0
+  final3_angle = 120;
+  difference3 = final3_angle-initial3_angle;
+
+  
+  if(difference3 >0)
+  {
+    servo3_speed = servo3_speed*-1;//
+  }
+  if(difference3 <0)  // if differemce is negative
+  {
+    servo3_speed = servo3_speed*-1;// mult by -1 to make it positive 
+    difference3 = difference3*-1;// update diff to positive ???
+  }
+  
+  
+  for(int i= 1; i <= difference1 ; i++)
+  {     
+    angle_increment3 = initial3_angle + servo3_speed;
+    s3.write(angle_increment3);
+      initial3_angle = angle_increment3;
+      delay(time);
+  
+    }
+}
